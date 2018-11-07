@@ -127,7 +127,7 @@ class DecisionTree:
                     try:
                         prediction = tree[attr][instance[attr]]
                     except:
-                        return y.mode()
+                        return y.mode()[0]
                     if isinstance(prediction, dict):
                         prediction = DecisionTree.predict(self, instance, prediction, y)
                         return prediction
@@ -154,13 +154,13 @@ class DecisionTree:
         prediction_list = []
         default = y.mode()
         for instance in instances:
-            prediction_list.append(DecisionTree.predict(self, instance, self.tree, default))
+            prediction_list.append(DecisionTree.predict(self, instance, self.tree, y))
         predictions = pd.Series(prediction_list)
 
-        result = {'precision': sk.precision_score(y, predictions, average="micro"),
-                  'recall': sk.recall_score(y, predictions, average="micro"),
+        result = {'precision': sk.precision_score(y, predictions, average="weighted"),
+                  'recall': sk.recall_score(y, predictions, average="weighted"),
                   'accuracy': sk.accuracy_score(y, predictions),
-                  'F1': sk.f1_score(y, predictions, average="micro"),
+                  'F1': sk.f1_score(y, predictions, average="weighted"),
                   'confusion-matrix': sk.confusion_matrix(y, predictions)}
         if display:
             print(result)
